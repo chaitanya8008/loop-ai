@@ -15,9 +15,9 @@ So, this is an API that does **data stuff**. It's written in **Node.js** and **E
 
 ## Tech
 
-* Node.js (duh)
-* Express (again, duh)
-* UUID (to make things unique)
+* Node.js
+* Express
+* UUID
 
 ---
 

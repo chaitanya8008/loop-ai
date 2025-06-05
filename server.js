@@ -5,19 +5,14 @@ const app = express();
 app.use(express.json());
 
 const PORT = 5000;
-
-// --- In-memory storage ---
 const ingestionStore = {}; // ingestion_id => { batches, status }
-const jobQueue = [];       // priority queue
+const jobQueue = []; 
 
-// --- Priority Mapping ---
 const priorityMap = { HIGH: 1, MEDIUM: 2, LOW: 3 };
 
-// --- Constants ---
 const BATCH_SIZE = 3;
-const BATCH_DELAY_MS = 5000; // 5 seconds
+const BATCH_DELAY_MS = 5000;
 
-// --- Helper ---
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -29,7 +24,6 @@ function getOverallStatus(batches) {
     return 'triggered';
 }
 
-// --- Worker to process jobs every 5 seconds ---
 async function startBatchProcessor() {
     while (true) {
         if (jobQueue.length > 0) {
@@ -39,27 +33,25 @@ async function startBatchProcessor() {
             const batch = job.batch;
             batch.status = 'triggered';
 
-            // Simulate async data fetching for each ID
+            
             await Promise.all(batch.ids.map(id => {
                 return new Promise(resolve => {
                     setTimeout(() => {
                         resolve({ id, data: 'processed' });
-                    }, 500); // Simulate processing delay
+                    }, 500);
                 });
             }));
 
             batch.status = 'completed';
 
-            // Update global status
             ingestion.status = getOverallStatus(ingestion.batches);
         }
 
-        await sleep(BATCH_DELAY_MS); // Wait 5 seconds before next batch
+        await sleep(BATCH_DELAY_MS); 
     }
 }
 
-// --- API Routes ---
-// POST /ingest
+
 app.post('/ingest', (req, res) => {
     const { ids, priority } = req.body;
 
@@ -80,7 +72,6 @@ app.post('/ingest', (req, res) => {
         };
         batches.push(batch);
 
-        // Queue the batch
         jobQueue.push({
             ingestion_id,
             priority: priorityMap[priority],
@@ -89,7 +80,6 @@ app.post('/ingest', (req, res) => {
         });
     }
 
-    // Sort queue after inserting (priority, then FIFO)
     jobQueue.sort((a, b) => {
         if (a.priority !== b.priority) return a.priority - b.priority;
         return a.created_at - b.created_at;
@@ -104,7 +94,7 @@ app.post('/ingest', (req, res) => {
     return res.status(200).json({ ingestion_id });
 });
 
-// GET /status/:ingestion_id
+
 app.get('/status/:ingestion_id', (req, res) => {
     const { ingestion_id } = req.params;
     const data = ingestionStore[ingestion_id];
@@ -122,8 +112,7 @@ app.get('/status/:ingestion_id', (req, res) => {
     });
 });
 
-// --- Start Server and Background Worker ---
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    startBatchProcessor(); // Start the background worker
+    console.log(`Server running on http://localhost:${PORT}`);
+    startBatchProcessor(); 
 });

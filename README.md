@@ -30,3 +30,7 @@ git clone https://github.com/chaitanya8008/loop-ai.git
 cd loop-ai
 ```
 start: npm start
+
+![image](https://github.com/user-attachments/assets/8ce8ace4-d94e-4761-9e38-e53b754e4f85)
+![image](https://github.com/user-attachments/assets/dd6c466f-57ed-4168-933d-a5bd453b6b49)
+
